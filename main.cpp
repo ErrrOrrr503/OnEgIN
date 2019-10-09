@@ -1,3 +1,15 @@
+//! @file main.cpp
+//! @mainpage Evgeniy Onegin sorter
+//! \n
+//! Usage: ./OnEgIN [-param] [input.file] [output.file]
+//! \n
+//! @author Titov.EM
+//! \n
+//! Files:
+//! \n
+//! - main.cpp
+//! \n
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,7 +24,6 @@ long get_lines_NUM(FILE *file, long long Fsize);
 int tolowerstr(char* str);
 int MAS_read(FILE *file, long long Fsize, char* mas, char** pointers);
 int MAS_write(char** pointers, FILE *file, long long num);
-long long get_file_size(FILE *file);
 int fopen_IO(char* fileName1, char* fileName2, FILE** in, FILE** out);
 
 int strcheck(char* str);
@@ -21,11 +32,26 @@ int chcheck (char ch);
 int strcmp_lecs (char* str1, char* str2);
 int strcmp_rythms_utf8 (char* str1, char* str2);
 
+//! Defines program behavior: 0 - lecs, 1 - rythms
 int BEHAVIOR = 0;
-//! 0 - lecs, 1 - rythms
+
+//! 1st byte of utf-8 russion symbol
+const int RUS01 = -48;
+//! 1st byte of utf-8 russion symbol
+const int RUS02 = -47;
+//! power of russian alphabet
+const int ALPH_NUM = 32;
 
 int main(int argc, char *argv[])
 {
+        /**
+        @return Error number
+        \n
+        1 - Input file unavaliable
+        2 - Bad using: incorrect arguments
+        3 - Bad using: unrecognised parameter
+        */
+
     setlocale(LC_ALL, "ru_RU.UTF8");
     if (argc != 4) {
             printf("Error 2: incorrect arguments\n");
@@ -74,6 +100,16 @@ int main(int argc, char *argv[])
 
 int fopen_IO(char* fileNameIN, char* fileNameOUT, FILE** in, FILE** out)
 {
+        /**
+        Opens input and output files
+        @param[in] fileNameIN (char*) Filename of input file
+        @param[in] fileNameOUT (char*) Filename of output file
+        @return Error Number
+        \n
+        1 - Error while file opening
+        0 - all good
+        */
+
     *in = NULL;
     *out = NULL;
     *in = fopen(fileNameIN,"r");
@@ -88,6 +124,17 @@ int fopen_IO(char* fileNameIN, char* fileNameOUT, FILE** in, FILE** out)
 
 int compstr(const void* a, const void* b)
 {
+        /**
+        qsort - compatitable interface for strings comparison
+        @param[in] a (const void*) 1st string
+        @param[in] b (const void*) 2nd string
+        @return Comparison result
+        \n
+        1 - a > b
+        0 - a == b
+        -1 - a < b
+        */
+
     long len_a = strlen (*(char** ) a);
     long len_b = strlen (*(char** ) b);
     char* str_a = (char*) malloc ((len_a + 1) * sizeof(char));
@@ -114,9 +161,13 @@ union wch {
 
 int tolowerstr(char* str)
 {
-    const int RUS01 = -48;
-    const int RUS02 = -47;
-    const int ALPH_NUM = 32;
+        /**
+        Converts string to lower-case
+        @param[in] str (char*) string
+        @return Error Number
+        \n
+        0 - all good
+        */
 
     wch a;
     for (long i = 0; (*(str + i) != '\0') && (*(str + i) != '\n') && (*(str + i) != EOF); i++) {
@@ -145,6 +196,12 @@ int tolowerstr(char* str)
 
 long long get_file_size_LINUX(char* filename)
 {
+        /**
+        Gets file size in linux-based OS
+        @param[in] filename (char*) no comments)
+        @return File size
+        */
+
     struct stat st;
     stat (filename, &st);
     return st.st_size;
@@ -152,6 +209,13 @@ long long get_file_size_LINUX(char* filename)
 
 long get_lines_NUM(FILE *file, long long Fsize)
 {
+        /**
+        Gets number of lines in file
+        @param[in] file (FILE*) input file
+        @param[in] Fsize (long long) size of the file
+        @return Number of lines
+        */
+
         assert (file != NULL);
         assert (Fsize > 0);
 
@@ -171,6 +235,17 @@ long get_lines_NUM(FILE *file, long long Fsize)
 
 int MAS_read(FILE *file, long long Fsize, char* mas, char** pointers)
 {
+        /**
+        Reads file to buffer
+        @param[in] file (FILE*) input file
+        @param[in] Fsize (long long) size of the file
+        @param[in] mas (char*) buffer
+        @param[in] pointers (char**) pointers to 1st elements of lines
+        @return Error number
+        \n
+        0 - all good
+        */
+
         assert (file != NULL);
         assert (mas != NULL);
         assert (pointers != NULL);
@@ -194,6 +269,16 @@ int MAS_read(FILE *file, long long Fsize, char* mas, char** pointers)
 
 int MAS_write(char** pointers, FILE *file, long long num)
 {
+        /**
+        Reads file to buffer
+        @param[in] pointers (char**) pointers to 1st elements of lines
+        @param[in] file (FILE*) input file
+        @param[in] num (long long) number of lines
+        @return Error number
+        \n
+        0 - all good
+        */
+
         assert (file != NULL);;
         assert (pointers != NULL);
         assert (num > 0);
@@ -210,6 +295,15 @@ int MAS_write(char** pointers, FILE *file, long long num)
 
 int strcheck(char* str)
 {
+        /**
+        Checks if string has symbols, visible to humans
+        @param[in] str (char*) string
+        @return Answer
+        \n
+        0 - all invisible
+        1 - at least 1 visible
+        */
+
         assert(str != NULL);
 
     int len = strlen(str);
@@ -221,6 +315,31 @@ int strcheck(char* str)
 
 int strcmp_lecs (char* str1, char* str2)
 {
+        /**
+        Compares 2 strings lexigraphically
+        @param[in] str1 (char*) string 1
+        @param[in] str2 (char*) string 2
+        @return
+        \n
+        1 - str1 > str2
+        0 - str1 == str2
+        -1 - str1 < str2
+        */
+
+    #define CHECK_STR_END(x, y)\
+            if ((unsigned char)*(x) == '\0') {\
+                if ((unsigned char)*(y) != '\0')\
+                    return -1;\
+                else\
+                    return 0;\
+            }\
+            if ((unsigned char)*(y) == '\0') {\
+                if ((unsigned char)*(x) != '\0')\
+                    return 1;\
+                else\
+                    return 0;\
+            }
+
         assert(str1 != NULL);
         assert(str2 != NULL);
 
@@ -233,18 +352,7 @@ int strcmp_lecs (char* str1, char* str2)
                 i++;
             if (!check2)
                 j++;
-            if ((unsigned char)*(str1 + i) == '\0') {
-                if ((unsigned char)*(str2 + j) != '\0')
-                    return -1;
-                else
-                    return 0;
-            }
-            if ((unsigned char)*(str2 + j) == '\0') {
-                if ((unsigned char)*(str1 + i) != '\0')
-                    return 1;
-                else
-                    return 0;
-            }
+            CHECK_STR_END(str1 + i, str2 + j);
         }
         else {
             if ((unsigned char)*(str1 + i) > (unsigned char)*(str2 + j))
@@ -253,101 +361,59 @@ int strcmp_lecs (char* str1, char* str2)
                 return -1;
             i++;
             j++;
-            if ((unsigned char)*(str1 + i) == '\0') {
-                if ((unsigned char)*(str2 + j) != '\0')
-                    return -1;
-                else
-                    return 0;
-            }
-            if ((unsigned char)*(str2 + j) == '\0') {
-                if ((unsigned char)*(str1 + i) != '\0')
-                    return 1;
-                else
-                    return 0;
-            }
+            CHECK_STR_END(str1 + i, str2 + j);
         }
     }
 }
 
 int strcmp_rythms_utf8 (char* str1, char* str2)
 {
-        assert(str1 != NULL);
-        assert(str2 != NULL);
+        /**
+        Compares 2 strings from end
+        @param[in] str1 (char*) string 1
+        @param[in] str2 (char*) string 2
+        @return
+        \n
+        1 - str1 > str2
+        0 - str1 == str2
+        -1 - str1 < str2
+        */
+
+    #define REVERSE(x, y)\
+        for (long i = 0; i < y / 2; i++) {\
+            char tmp = *(x + i);\
+            *(x + i) = *(x + y - 1 - i);\
+            *(x + y - 1 - i) = tmp;\
+        }\
+        *(x + y) = '\0';\
+        for (long i = 1; i < y; i++) {\
+            if (chcheck(*(x + i)) == 2) {\
+                char tmp = *(x + i - 1);\
+                *(x + i - 1) = *(x + i);\
+                *(x + i) = tmp;\
+            }\
+        }\
 
     long len1 = strlen (str1);
     long len2 = strlen (str2);
-
-    long j = len2 - 1, i = len1 - 1;
-    int block1 = 0, block2 = 0;
-    while (1) {
-        int check1 = chcheck (*(str1 + i));
-        int check2 = chcheck (*(str2 + j));
-
-        if (block1 == 2) block1 = 0;
-        if (block2 == 2) block2 = 0;
-        if (check1 == 2 && i > 0) {
-            char tmp;
-            if (!block1) {
-                tmp = *(str1 + i - 1);
-                *(str1 + i - 1) = *(str1 + i);
-                *(str1 + i) = tmp;
-            }
-            block1++;
-        }
-        if (check2 == 2 && j > 0) {
-            char tmp;
-            if (!block2) {
-                tmp = *(str2 + j - 1);
-                *(str2 + j - 1) = *(str2 + j);
-                *(str2 + j) = tmp;
-            }
-            block2++;
-        }
-
-        if (!check1 || !check2) {
-            if (!check1)
-                i--;
-            if (!check2)
-                j--;
-            if (i <= 0) {
-                if (j > 0)
-                    return -1;
-                else
-                    return 0;
-            }
-            if (j <= 0) {
-                if (i > 0)
-                    return 1;
-                else
-                    return 0;
-            }
-        }
-        else {
-            if ((unsigned char)*(str1 + i) > (unsigned char)*(str2 + j))
-                return 1;
-            if ((unsigned char)*(str1 + i) < (unsigned char)*(str2 + j))
-                return -1;
-            i--;
-            j--;
-            if (i <= 0) {
-                if (j > 0)
-                    return -1;
-                else
-                    return 0;
-            }
-            if (j <= 0) {
-                if (i > 0)
-                    return 1;
-                else
-                    return 0;
-            }
-        }
-    }
+    REVERSE(str1, len1);
+    REVERSE(str2, len2);
+    return strcmp_lecs(str1, str2);
 }
 
 int chcheck (char ch)
 {
-    if (ch == -47 || ch == -48)
+        /**
+        tells if symbol is worth comparison or is special
+        @param[in] ch (char) symbol
+        @return
+        \n
+        1 - worth
+        0 - not worth
+        2 - special rus-letter symbol
+        */
+
+    if (ch == RUS01 || ch == RUS02)
         return 2;
     if ((ch >= ' ' && ch < '0') || (ch > '9' && ch < 'A') || (ch > 'Z' && ch < 'a') || (ch > 'z' && ch < 127))
         return 0;
