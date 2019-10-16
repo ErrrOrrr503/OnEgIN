@@ -3,6 +3,8 @@
 //! \n
 //! Usage: ./OnEgIN [-param] [input.file] [output.file]
 //! \n
+//! Params: [-l]: compare lexigraphically; [-r]: compare rythmically
+//! \n
 //! @author Titov.EM
 //! \n
 //! Files:
@@ -21,11 +23,11 @@
 long long get_file_size_LINUX(char* filename);
 
 long get_lines_NUM(FILE *file, long long Fsize);
-int tolowerstr(char* str);
 int MAS_read(FILE *file, long long Fsize, char* mas, char** pointers);
 int MAS_write(char** pointers, FILE *file, long long num);
 int fopen_IO(char* fileName1, char* fileName2, FILE** in, FILE** out);
 
+int tolowerstr(char* str);
 int strcheck(char* str);
 int compstr(const void* a, const void* b);
 int chcheck (char ch);
@@ -98,7 +100,7 @@ int main(int argc, char *argv[])
 }
 
 
-int fopen_IO(char* fileNameIN, char* fileNameOUT, FILE** in, FILE** out)
+int fopen_IO (char* fileNameIN, char* fileNameOUT, FILE** in, FILE** out)
 {
         /**
         Opens input and output files
@@ -110,14 +112,19 @@ int fopen_IO(char* fileNameIN, char* fileNameOUT, FILE** in, FILE** out)
         0 - all good
         */
 
+        assert (fileNameIN != NULL);
+        assert (fileNameOUT != NULL);
+        assert (in != NULL);
+        assert (out != NULL);
+
     *in = NULL;
     *out = NULL;
-    *in = fopen(fileNameIN,"r");
+    *in = fopen (fileNameIN,"r");
     if (*in == NULL) {
         return 1;
     }
 
-    *out = fopen(fileNameOUT,"wt");
+    *out = fopen (fileNameOUT,"wt");
     return 0;
 }
 
@@ -134,6 +141,8 @@ int compstr(const void* a, const void* b)
         0 - a == b
         -1 - a < b
         */
+        assert (a != NULL);
+        assert (b != NULL);
 
     long len_a = strlen (*(char** ) a);
     long len_b = strlen (*(char** ) b);
@@ -169,6 +178,8 @@ int tolowerstr(char* str)
         0 - all good
         */
 
+        assert (str != NULL);
+
     wch a;
     for (long i = 0; (*(str + i) != '\0') && (*(str + i) != '\n') && (*(str + i) != EOF); i++) {
         if ((int)*(str + i) == RUS01  || (int)*(str + i) == RUS02) {
@@ -188,19 +199,21 @@ int tolowerstr(char* str)
             i++;
         }
         else {
-            *(str + i) = tolower(*(str + i));
+            *(str + i) = tolower (*(str + i));
         }
     }
     return 0;
 }
 
-long long get_file_size_LINUX(char* filename)
+long long get_file_size_LINUX (char* filename)
 {
         /**
         Gets file size in linux-based OS
         @param[in] filename (char*) no comments)
         @return File size
         */
+
+        assert (filename != NULL);
 
     struct stat st;
     stat (filename, &st);
@@ -298,7 +311,7 @@ int strcheck(char* str)
         /**
         Checks if string has symbols, visible to humans
         @param[in] str (char*) string
-        @return Answer
+        @return
         \n
         0 - all invisible
         1 - at least 1 visible
@@ -316,7 +329,7 @@ int strcheck(char* str)
 int strcmp_lecs (char* str1, char* str2)
 {
         /**
-        Compares 2 strings lexigraphically
+        Compares 2 strings lexigraphically. WARNING! function CHANGES strings!
         @param[in] str1 (char*) string 1
         @param[in] str2 (char*) string 2
         @return
@@ -369,7 +382,7 @@ int strcmp_lecs (char* str1, char* str2)
 int strcmp_rythms_utf8 (char* str1, char* str2)
 {
         /**
-        Compares 2 strings from end
+        Compares 2 strings from end. WARNING! function CHANGES strings!
         @param[in] str1 (char*) string 1
         @param[in] str2 (char*) string 2
         @return
@@ -393,6 +406,9 @@ int strcmp_rythms_utf8 (char* str1, char* str2)
                 *(x + i) = tmp;\
             }\
         }\
+
+        assert(str1 != NULL);
+        assert(str2 != NULL);
 
     long len1 = strlen (str1);
     long len2 = strlen (str2);
