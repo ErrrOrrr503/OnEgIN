@@ -5,6 +5,8 @@
 //! \n
 //! Params: [-l]: compare lexigraphically; [-r]: compare rythmically
 //! \n
+//! Example: ./OnEgIN -r onegin.txt oneginSorted_rythms.txt
+//! \n
 //! @author Titov.EM
 //! \n
 //! Files:
